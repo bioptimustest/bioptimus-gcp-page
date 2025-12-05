@@ -8,99 +8,445 @@
     name="description"
     content="Overview of the Bioptimus Universal Biological Foundation Model and how it is built and deployed on Google Cloud Platform."
   />
- <style>
-  :root {
-    --bg: #f7f9ff;
-    --bg-alt: #ffffff;
-    --accent: #6a5acd;
-    --accent-soft: rgba(106, 90, 205, 0.2);
-    --text-main: #2a2a2a;
-    --text-muted: #6b6b6b;
-    --border-subtle: #e0e0e0;
-    --card-radius: 14px;
-    --max-width: 1120px;
-  }
 
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: linear-gradient(135deg, #faf7ff 0%, #eef4ff 40%, #e3fdfd 100%);
-    color: var(--text-main);
-    line-height: 1.6;
-  }
+  <style>
+    :root {
+      --bg: #f7f9ff;
+      --bg-alt: #ffffff;
+      --accent: #7b6cff;       /* 梦幻紫蓝色 */
+      --accent-soft: rgba(123, 108, 255, 0.18);
+      --accent-pink: #ff9bd9;  /* 柔和粉色 */
+      --text-main: #1f2933;
+      --text-muted: #6b7280;
+      --border-subtle: #e0e7ff;
+      --card-radius: 16px;
+      --max-width: 1120px;
+    }
 
-  header {
-    background: rgba(255, 255, 255, 0.75);
-    border-bottom: 1px solid #e0e0e0;
-    backdrop-filter: blur(14px);
-  }
+    * {
+      box-sizing: border-box;
+    }
 
-  .logo-mark {
-    background: radial-gradient(circle at 30% 0, #b39ddb 0, #9575cd 40%, #6a5acd 80%);
-    border: 1px solid rgba(106, 90, 205, 0.5);
-    box-shadow: 0 0 12px rgba(106, 90, 205, 0.4);
-  }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background:
+        radial-gradient(circle at 0% 0%, #ffe8f3 0, transparent 42%),
+        radial-gradient(circle at 100% 0%, #e0f2fe 0, transparent 45%),
+        radial-gradient(circle at 100% 100%, #e7ffe7 0, transparent 48%),
+        linear-gradient(145deg, #f8f9ff 0%, #edf5ff 40%, #effafc 100%);
+      color: var(--text-main);
+      line-height: 1.6;
+    }
 
-  .hero-title span {
-    color: #6a5acd;
-  }
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
 
-  .hero-subtitle {
-    color: #6b6b6b;
-  }
+    a:hover {
+      text-decoration: underline;
+    }
 
-  .btn-primary {
-    background: linear-gradient(135deg, #b39ddb, #81d4fa);
-    color: #ffffff;
-    border: none;
-    box-shadow: 0 12px 30px rgba(129, 212, 250, 0.45);
-  }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255, 255, 255, 0.85);
+      border-bottom: 1px solid rgba(224, 231, 255, 0.8);
+      backdrop-filter: blur(18px);
+    }
 
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 16px 34px rgba(129, 212, 250, 0.55);
-  }
+    .nav {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0.7rem 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
 
-  .hero-metrics {
-    background: rgba(255, 255, 255, 0.65);
-    backdrop-filter: blur(20px);
-    border: 1px solid #e0e0e0;
-    box-shadow: 0 20px 55px rgba(200, 200, 255, 0.4);
-  }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      color: #4b5563;
+    }
 
-  .metric {
-    background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(14px);
-    border: 1px solid #e0e0e0;
-  }
+    .logo-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      border: 1px solid rgba(123, 108, 255, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      background:
+        radial-gradient(circle at 20% 0, #ffe9ff 0, #f9a8d4 26%, transparent 60%),
+        radial-gradient(circle at 80% 100%, #bfdbfe 0, #7c3aed 45%);
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.9),
+        0 0 16px rgba(123, 108, 255, 0.7);
+      color: #ffffff;
+    }
 
-  .badge {
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid #d5d5ff;
-    color: #6a5acd;
-  }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      font-size: 0.88rem;
+    }
 
-  .card {
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid #e0e0e0;
-    backdrop-filter: blur(18px);
-    box-shadow: 0 8px 35px rgba(180, 180, 255, 0.35);
-  }
+    .nav-links a {
+      color: var(--text-muted);
+      padding: 0.35rem 0.65rem;
+      border-radius: 999px;
+    }
 
-  .use-case {
-    background: rgba(255, 255, 255, 0.65);
-    border: 1px solid #e6e0ff;
-    box-shadow: 0 8px 25px rgba(200, 200, 255, 0.35);
-  }
+    .nav-links a:hover {
+      background: rgba(209, 213, 219, 0.5);
+      color: var(--text-main);
+      text-decoration: none;
+    }
 
-  footer {
-    background: rgba(255, 255, 255, 0.5);
-    border-top: 1px solid #e0e0e0;
-  }
-</style>
+    .pill {
+      border-radius: 999px;
+      border: 1px solid rgba(123, 108, 255, 0.65);
+      padding: 0.25rem 0.9rem;
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--accent);
+      background: rgba(255, 255, 255, 0.8);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      box-shadow: 0 10px 26px rgba(148, 163, 255, 0.4);
+    }
 
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #34d399;
+      box-shadow: 0 0 10px rgba(52, 211, 153, 0.9);
+    }
+
+    main {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 2rem 1.4rem 3.6rem;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2.3fr);
+      gap: 2.1rem;
+      align-items: center;
+      margin-top: 1.7rem;
+      margin-bottom: 3rem;
+    }
+
+    .kicker {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+    }
+
+    .hero-title {
+      font-size: clamp(2.1rem, 3.1vw, 2.8rem);
+      line-height: 1.12;
+      margin: 0.7rem 0 0.5rem;
+      background: linear-gradient(120deg, #111827, #4b5563, #7b6cff);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero-title span {
+      background: linear-gradient(130deg, var(--accent), var(--accent-pink));
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero-subtitle {
+      color: var(--text-muted);
+      max-width: 36rem;
+      font-size: 0.98rem;
+    }
+
+    .hero-cta {
+      margin-top: 1.2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .btn {
+      border-radius: 999px;
+      padding: 0.55rem 1.35rem;
+      font-size: 0.9rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      text-decoration: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease,
+        background 0.15s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #7b6cff, #a855f7, #f973b3);
+      color: #ffffff;
+      border: none;
+      box-shadow:
+        0 12px 30px rgba(123, 108, 255, 0.45),
+        0 0 0 1px rgba(255, 255, 255, 0.7);
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        0 16px 34px rgba(123, 108, 255, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.9);
+      text-decoration: none;
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(199, 210, 254, 0.9);
+      color: #374151;
+      box-shadow: 0 8px 20px rgba(148, 163, 255, 0.3);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(238, 242, 255, 0.9);
+      transform: translateY(-1px);
+      text-decoration: none;
+    }
+
+    .hero-metrics {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 22px;
+      border: 1px solid rgba(224, 231, 255, 0.9);
+      padding: 1.25rem 1.3rem 1.1rem;
+      box-shadow:
+        0 24px 65px rgba(148, 163, 255, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(24px);
+    }
+
+    .hero-metrics-title {
+      font-size: 0.84rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.7rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(123, 108, 255, 0.7);
+      padding: 0.22rem 0.75rem;
+      font-size: 0.74rem;
+      color: var(--accent);
+      background: rgba(238, 242, 255, 0.9);
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.9rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .metric {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 14px;
+      padding: 0.65rem 0.7rem;
+      border: 1px solid rgba(226, 232, 255, 0.9);
+    }
+
+    .metric-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+
+    .metric-value {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .metric-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .stack-caption {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    section {
+      margin-bottom: 2.6rem;
+    }
+
+    h2 {
+      font-size: 1.38rem;
+      margin: 0 0 0.6rem;
+      color: #111827;
+    }
+
+    h3 {
+      font-size: 1.04rem;
+      margin: 0 0 0.35rem;
+      color: #111827;
+    }
+
+    p {
+      margin: 0.2rem 0 0.75rem;
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 1.7rem;
+      align-items: flex-start;
+    }
+
+    .card {
+      border-radius: var(--card-radius);
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.92);
+      padding: 1.1rem 1.2rem;
+      box-shadow: 0 16px 40px rgba(163, 177, 255, 0.45);
+      backdrop-filter: blur(20px);
+    }
+
+    .card + .card {
+      margin-top: 0.8rem;
+    }
+
+    .list {
+      padding-left: 1.1rem;
+      margin: 0.2rem 0 0.7rem;
+      font-size: 0.93rem;
+      color: var(--text-muted);
+    }
+
+    .list li {
+      margin-bottom: 0.28rem;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.15rem;
+    }
+
+    .badge {
+      font-size: 0.74rem;
+      border-radius: 999px;
+      border: 1px solid rgba(199, 210, 254, 0.9);
+      padding: 0.16rem 0.62rem;
+      color: #4b5563;
+      background: rgba(248, 250, 252, 0.9);
+    }
+
+    pre {
+      background: #020617;
+      border-radius: 12px;
+      border: 1px solid rgba(15, 23, 42, 0.9);
+      padding: 0.9rem 1rem;
+      font-size: 0.8rem;
+      overflow-x: auto;
+      color: #e5e7eb;
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.7);
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+    }
+
+    .use-case-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .use-case {
+      border-radius: var(--card-radius);
+      border: 1px solid rgba(209, 213, 255, 0.9);
+      padding: 0.9rem 0.95rem;
+      background: rgba(255, 255, 255, 0.92);
+      font-size: 0.9rem;
+      box-shadow: 0 12px 32px rgba(163, 177, 255, 0.45);
+      backdrop-filter: blur(18px);
+    }
+
+    .use-case h3 {
+      margin-bottom: 0.2rem;
+    }
+
+    footer {
+      border-top: 1px solid rgba(209, 213, 255, 0.9);
+      padding: 1.4rem 1.4rem 2rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      max-width: var(--max-width);
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(16px);
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+    }
+
+    @media (max-width: 880px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .section-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .use-case-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .nav-links {
+        display: none;
+      }
+      main {
+        padding-top: 1.5rem;
+      }
+    }
+  </style>
 </head>
+
 <body>
   <header>
     <div class="nav">
@@ -132,8 +478,8 @@
         </h1>
         <p class="hero-subtitle">
           Bioptimus provides a universal AI foundation model for biology,
-          integrating multimodal and multiscale data—from molecules to
-          whole-organism context. On Google Cloud Platform (GCP), the model
+          integrating multimodal and multiscale data—from molecules and cells
+          to whole-organism context. On Google Cloud Platform (GCP), the model
           is trained, governed, and deployed using cloud-native services that
           make advanced biomedical AI accessible to research, clinical, and
           industry partners worldwide.
@@ -147,10 +493,7 @@
           >
             Visit Bioptimus
           </a>
-          <a
-            class="btn btn-ghost"
-            href="#architecture"
-          >
+          <a class="btn btn-ghost" href="#architecture">
             View GCP architecture
           </a>
         </div>
@@ -184,7 +527,7 @@
             </div>
           </div>
         </div>
-        <div class="metric" style="margin-top:0.4rem">
+        <div class="metric" style="margin-top:0.45rem">
           <div class="metric-label">Google Cloud stack</div>
           <div class="badge-row">
             <span class="badge">Vertex AI</span>
@@ -197,7 +540,7 @@
           </div>
           <p class="stack-caption">
             An opinionated, production-ready stack for multimodal biological
-            AI workloads.
+            AI workloads on GCP.
           </p>
         </div>
       </aside>
@@ -217,7 +560,7 @@
             serve low-latency inference APIs to partners.
           </p>
           <p>
-            GCP provides secure, compliant infrastructure for processing
+            GCP provides secure, compliance-aligned infrastructure for processing
             sensitive biomedical data while enabling high-throughput
             experimentation. Research groups and clinical teams interact with
             the platform through well-defined APIs and workflows, without
@@ -233,8 +576,8 @@
               <li>
                 <strong>Foundation model backbone</strong> – pre-trained on
                 large-scale biological datasets, then specialized for tasks
-                such as biomarker discovery, survival prediction, and
-                patient stratification.
+                such as biomarker discovery, survival prediction, and patient
+                stratification.
               </li>
               <li>
                 <strong>Cloud-native deployment</strong> – autoscaled,
@@ -309,9 +652,9 @@
           <h3>Translational &amp; basic research</h3>
           <p>
             Research labs leverage pretrained representations hosted on
-            Vertex AI to accelerate discovery across oncology, immunology,
-            and rare disease research. Multimodal embeddings can be exported
-            to BigQuery for downstream analytics, clustering, and hypothesis
+            Vertex AI to accelerate discovery across oncology, immunology, and
+            rare disease research. Multimodal embeddings can be exported to
+            BigQuery for downstream analytics, clustering, and hypothesis
             generation without handling raw PHI.
           </p>
           <ul class="list">
@@ -361,8 +704,8 @@
           <div class="kicker">Trust, security, and governance</div>
           <h2>Operating sensitive biological workloads responsibly</h2>
           <p>
-            Biomedical data is among the most sensitive information handled
-            in modern research and healthcare. Bioptimus uses Google Cloud’s
+            Biomedical data is among the most sensitive information handled in
+            modern research and healthcare. Bioptimus uses Google Cloud’s
             security and governance capabilities to ensure that its
             foundation-model platform is ready for real-world deployments.
           </p>
@@ -392,8 +735,8 @@
                 service connect, and restricted egress patterns.
               </li>
               <li>
-                <strong>Secrets management</strong> through Secret Manager
-                for credentials and key material.
+                <strong>Secrets management</strong> through Secret Manager for
+                credentials and key material.
               </li>
               <li>
                 <strong>Observability &amp; audit trails</strong> using Cloud
@@ -495,8 +838,8 @@
         Model can be built and operated on Google Cloud Platform.
       </span>
       <span>
-        Built for GitHub Pages. Edit this file and commit as
-        <code>index.html</code> or similar in your repository.
+        Built for GitHub Pages. Save this file as
+        <code>index.html</code> in your repository.
       </span>
     </div>
   </footer>
