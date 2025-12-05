@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bioptimus Universal Biological Foundation Model on Google Cloud</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="description"
+    content="Overview of the Bioptimus Universal Biological Foundation Model and how it is built and deployed on Google Cloud Platform."
+  />
+  <style>
+    :root {
+      --bg: #050814;
+      --bg-alt: #0c1020;
+      --accent: #4fd1c5;
+      --accent-soft: rgba(79, 209, 197, 0.16);
+      --text-main: #f7fafc;
+      --text-muted: #a0aec0;
+      --border-subtle: #2d3748;
+      --card-radius: 14px;
+      --max-width: 1120px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top left, #1a365d 0, #050814 50%);
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    header {
+      border-bottom: 1px solid rgba(160, 174, 192, 0.15);
+      backdrop-filter: blur(14px);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: linear-gradient(
+        to bottom,
+        rgba(5, 8, 20, 0.96),
+        rgba(5, 8, 20, 0.9),
+        transparent
+      );
+    }
+
+    .nav {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+    }
+
+    .logo-mark {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      border: 1px solid rgba(129, 230, 217, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      background: radial-gradient(circle at 30% 0, #81e6d9 0, #234e52 40%, #050814 80%);
+      box-shadow: 0 0 18px rgba(72, 187, 120, 0.7);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      padding: 0.25rem 0.4rem;
+      border-radius: 999px;
+    }
+
+    .nav-links a:hover {
+      background: rgba(113, 128, 150, 0.18);
+      color: var(--text-main);
+      text-decoration: none;
+    }
+
+    .pill {
+      border-radius: 999px;
+      border: 1px solid rgba(79, 209, 197, 0.6);
+      padding: 0.25rem 0.75rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      background: rgba(15, 118, 110, 0.18);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #48bb78;
+      box-shadow: 0 0 10px rgba(72, 187, 120, 0.9);
+    }
+
+    main {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 2.25rem 1.5rem 3.5rem;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2.4fr);
+      gap: 2rem;
+      align-items: center;
+      margin-top: 1.5rem;
+      margin-bottom: 2.75rem;
+    }
+
+    .hero-title {
+      font-size: clamp(2.2rem, 3.1vw, 2.8rem);
+      line-height: 1.1;
+      margin: 0.75rem 0 0.6rem;
+    }
+
+    .hero-title span {
+      color: var(--accent);
+    }
+
+    .hero-subtitle {
+      color: var(--text-muted);
+      max-width: 36rem;
+      font-size: 0.98rem;
+    }
+
+    .hero-cta {
+      margin-top: 1.2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .btn {
+      border-radius: 999px;
+      padding: 0.55rem 1.25rem;
+      font-size: 0.9rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #38b2ac, #63b3ed);
+      color: #0b1120;
+      border-color: rgba(56, 178, 172, 0.9);
+      box-shadow: 0 12px 30px rgba(66, 153, 225, 0.45);
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 14px 32px rgba(66, 153, 225, 0.65);
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      background: rgba(23, 25, 35, 0.8);
+      border-color: rgba(148, 163, 184, 0.6);
+      color: var(--text-main);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(30, 64, 175, 0.55);
+      text-decoration: none;
+    }
+
+    .hero-metrics {
+      background: radial-gradient(circle at top, rgba(99, 179, 237, 0.16), #050814);
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 1.3rem 1.3rem 1.1rem;
+      box-shadow: 0 20px 55px rgba(15, 23, 42, 0.95);
+    }
+
+    .hero-metrics-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(79, 209, 197, 0.5);
+      padding: 0.25rem 0.7rem;
+      font-size: 0.75rem;
+      color: var(--accent);
+      background: rgba(6, 95, 91, 0.55);
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.9rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .metric {
+      background: rgba(15, 23, 42, 0.85);
+      border-radius: 12px;
+      padding: 0.65rem 0.7rem;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+    }
+
+    .metric-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+
+    .metric-value {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .metric-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .stack-caption {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    section {
+      margin-bottom: 2.5rem;
+    }
+
+    h2 {
+      font-size: 1.35rem;
+      margin: 0 0 0.6rem;
+    }
+
+    h3 {
+      font-size: 1.05rem;
+      margin: 0 0 0.35rem;
+    }
+
+    p {
+      margin: 0.2rem 0 0.7rem;
+    }
+
+    .kicker {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 1.7rem;
+      align-items: flex-start;
+    }
+
+    .card {
+      border-radius: var(--card-radius);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.9);
+      padding: 1.1rem 1.2rem;
+      box-shadow: 0 15px 35px rgba(15, 23, 42, 0.85);
+    }
+
+    .card + .card {
+      margin-top: 0.75rem;
+    }
+
+    .list {
+      padding-left: 1.1rem;
+      margin: 0.2rem 0 0.6rem;
+      font-size: 0.92rem;
+      color: var(--text-muted);
+    }
+
+    .list li {
+      margin-bottom: 0.3rem;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.15rem;
+    }
+
+    .badge {
+      font-size: 0.72rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.15rem 0.6rem;
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    pre {
+      background: #020617;
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.9rem 1rem;
+      font-size: 0.78rem;
+      overflow-x: auto;
+      color: #e2e8f0;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+    }
+
+    .use-case-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .use-case {
+      border-radius: var(--card-radius);
+      border: 1px solid rgba(75, 85, 99, 0.8);
+      padding: 0.85rem 0.9rem;
+      background: rgba(15, 23, 42, 0.95);
+      font-size: 0.9rem;
+    }
+
+    .use-case h3 {
+      margin-bottom: 0.15rem;
+    }
+
+    footer {
+      border-top: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 1.4rem 1.5rem 2rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 880px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .section-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .use-case-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .nav-links {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav">
+      <div class="logo">
+        <div class="logo-mark">B</div>
+        <span>Bioptimus</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#overview">Overview</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#use-cases">Use cases</a>
+        <a href="#security">Security</a>
+        <a href="#getting-started">Getting started</a>
+      </nav>
+      <div class="pill">
+        <span class="pill-dot"></span>
+        Built on Google Cloud
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="overview">
+      <div>
+        <div class="kicker">Biology transformed with Google Cloud</div>
+        <h1 class="hero-title">
+          Bioptimus Universal Biological Foundation Model
+          <span>on GCP</span>
+        </h1>
+        <p class="hero-subtitle">
+          Bioptimus provides a universal AI foundation model for biology,
+          integrating multimodal and multiscale data—from molecules to
+          whole-organism context. On Google Cloud Platform (GCP), the model
+          is trained, governed, and deployed using cloud-native services that
+          make advanced biomedical AI accessible to research, clinical, and
+          industry partners worldwide.
+        </p>
+        <div class="hero-cta">
+          <a
+            class="btn btn-primary"
+            href="https://bioptimus.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Visit Bioptimus
+          </a>
+          <a
+            class="btn btn-ghost"
+            href="#architecture"
+          >
+            View GCP architecture
+          </a>
+        </div>
+      </div>
+
+      <aside class="hero-metrics">
+        <div class="hero-metrics-title">
+          <span>Bioptimus in numbers</span>
+          <span class="chip">Foundation model for biology</span>
+        </div>
+        <div class="metric-grid">
+          <div class="metric">
+            <div class="metric-label">Model ranking</div>
+            <div class="metric-value">#1</div>
+            <div class="metric-sub">
+              Among 22 digital pathology foundation models
+            </div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Downloads</div>
+            <div class="metric-value">~1M</div>
+            <div class="metric-sub">
+              Cumulative model &amp; checkpoint downloads
+            </div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Publications</div>
+            <div class="metric-value">100+</div>
+            <div class="metric-sub">
+              Annual scientific papers using our models
+            </div>
+          </div>
+        </div>
+        <div class="metric" style="margin-top:0.4rem">
+          <div class="metric-label">Google Cloud stack</div>
+          <div class="badge-row">
+            <span class="badge">Vertex AI</span>
+            <span class="badge">GKE</span>
+            <span class="badge">Compute Engine (GPU/TPU)</span>
+            <span class="badge">Cloud Storage</span>
+            <span class="badge">BigQuery</span>
+            <span class="badge">Artifact Registry</span>
+            <span class="badge">Cloud Logging &amp; Monitoring</span>
+          </div>
+          <p class="stack-caption">
+            An opinionated, production-ready stack for multimodal biological
+            AI workloads.
+          </p>
+        </div>
+      </aside>
+    </section>
+
+    <section id="architecture">
+      <div class="section-grid">
+        <div>
+          <div class="kicker">Solution overview</div>
+          <h2>How Bioptimus runs on Google Cloud</h2>
+          <p>
+            The Bioptimus Universal Biological Foundation Model integrates
+            genomics, microscopy, digital pathology, and clinical metadata into
+            a unified representation that captures patterns across scales. On
+            Google Cloud, Bioptimus uses managed AI, compute, and data services
+            to train large models, orchestrate reproducible pipelines, and
+            serve low-latency inference APIs to partners.
+          </p>
+          <p>
+            GCP provides secure, compliant infrastructure for processing
+            sensitive biomedical data while enabling high-throughput
+            experimentation. Research groups and clinical teams interact with
+            the platform through well-defined APIs and workflows, without
+            needing to manage low-level infrastructure.
+          </p>
+          <div class="card">
+            <h3>Key capabilities</h3>
+            <ul class="list">
+              <li>
+                <strong>Multimodal, multiscale modeling</strong> – jointly
+                represents molecular, tissue, and patient-level data.
+              </li>
+              <li>
+                <strong>Foundation model backbone</strong> – pre-trained on
+                large-scale biological datasets, then specialized for tasks
+                such as biomarker discovery, survival prediction, and
+                patient stratification.
+              </li>
+              <li>
+                <strong>Cloud-native deployment</strong> – autoscaled,
+                containerized model services running across GKE and Vertex AI.
+              </li>
+              <li>
+                <strong>Research-to-production path</strong> – shared
+                pipelines and artifacts from experimentation to clinical
+                validation.
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h3>High-level GCP architecture</h3>
+            <pre><code>                        ┌──────────────────────────────┐
+                        │   Biomedical data sources    │
+                        │  (omics, H&amp;E, slides, EHR)   │
+                        └──────────────┬───────────────┘
+                                       │
+                           Ingestion &amp; preprocessing
+                                       │
+                     ┌─────────────────▼─────────────────┐
+                     │    Cloud Storage / BigQuery       │
+                     │  Raw &amp; curated multimodal data    │
+                     └─────────────────┬─────────────────┘
+                                       │
+                              Feature generation
+                                       │
+         ┌─────────────────────────────▼─────────────────────────────┐
+         │             Vertex AI Pipelines / GKE jobs                │
+         │  - Large-scale training on GPU / TPU (Compute Engine)    │
+         │  - Hyperparameter search, evaluation, model selection    │
+         └─────────────────────────────┬─────────────────────────────┘
+                                       │
+                                Model registry
+                                       │
+                    ┌──────────────────▼─────────────────┐
+                    │      Artifact Registry / Vertex    │
+                    │      AI Model Registry             │
+                    └──────────────────┬─────────────────┘
+                                       │
+                                   Deployment
+                                       │
+         ┌─────────────────────────────▼─────────────────────────────┐
+         │         GKE + Vertex AI Endpoints (online / batch)       │
+         │  - REST/gRPC APIs for research &amp; clinical partners       │
+         │  - Autoscaling, canary rollout, A/B testing              │
+         └─────────────────────────────┬─────────────────────────────┘
+                                       │
+                           Monitoring &amp; governance
+                                       │
+                        Cloud Logging / Monitoring / IAM</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="use-cases">
+      <div class="kicker">Applications</div>
+      <h2>What the foundation model enables on GCP</h2>
+      <p>
+        Built on Google Cloud, the Bioptimus Universal Biological Foundation
+        Model supports diverse scientific, clinical, and industrial use cases
+        while keeping the core infrastructure consistent and maintainable.
+      </p>
+
+      <div class="use-case-grid">
+        <div class="use-case">
+          <h3>Translational &amp; basic research</h3>
+          <p>
+            Research labs leverage pretrained representations hosted on
+            Vertex AI to accelerate discovery across oncology, immunology,
+            and rare disease research. Multimodal embeddings can be exported
+            to BigQuery for downstream analytics, clustering, and hypothesis
+            generation without handling raw PHI.
+          </p>
+          <ul class="list">
+            <li>Self-supervised learning from large biological corpora</li>
+            <li>Cross-modal retrieval between images, omics, and text</li>
+            <li>Foundation features for new tasks with minimal labeling</li>
+          </ul>
+        </div>
+
+        <div class="use-case">
+          <h3>Pharma &amp; biotech pipelines</h3>
+          <p>
+            Pharmaceutical and biotech companies connect to GCP-hosted
+            inference APIs for biomarker discovery, cohort selection, and
+            mechanism-of-action studies. Autoscaled GKE deployments allow
+            teams to run large retrospective analyses without managing GPU
+            clusters.
+          </p>
+          <ul class="list">
+            <li>Biomarker and pathway enrichment predictions</li>
+            <li>Patient stratification across trial arms</li>
+            <li>Integration with existing GCP-based R&amp;D data lakes</li>
+          </ul>
+        </div>
+
+        <div class="use-case">
+          <h3>Clinical prediction &amp; decision support</h3>
+          <p>
+            In collaborations like the MIT clinical cancer prediction study,
+            Bioptimus models deployed on Vertex AI Endpoints generate
+            progression-free survival and risk predictions from digital
+            pathology and clinical covariates, with strict access control and
+            auditing managed through IAM and Cloud Logging.
+          </p>
+          <ul class="list">
+            <li>Prognostic models for survival and response</li>
+            <li>Embedding-based patient similarity search</li>
+            <li>Explainability tooling integrated via custom services</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="security">
+      <div class="section-grid">
+        <div>
+          <div class="kicker">Trust, security, and governance</div>
+          <h2>Operating sensitive biological workloads responsibly</h2>
+          <p>
+            Biomedical data is among the most sensitive information handled
+            in modern research and healthcare. Bioptimus uses Google Cloud’s
+            security and governance capabilities to ensure that its
+            foundation-model platform is ready for real-world deployments.
+          </p>
+          <p>
+            Data is logically isolated by tenant using separate projects and
+            VPCs. IAM roles and service accounts govern access to storage,
+            compute, and model endpoints. When partners require full control,
+            Bioptimus can deploy dedicated stacks in their own GCP projects
+            while preserving the same architecture and best practices.
+          </p>
+        </div>
+        <div>
+          <div class="card">
+            <h3>Security &amp; compliance features</h3>
+            <ul class="list">
+              <li>
+                <strong>Encryption in transit &amp; at rest</strong> using
+                default GCP mechanisms for Cloud Storage, BigQuery, and
+                databases.
+              </li>
+              <li>
+                <strong>Fine-grained access control</strong> via IAM, service
+                accounts, and per-tenant projects.
+              </li>
+              <li>
+                <strong>Network isolation</strong> with private VPCs, private
+                service connect, and restricted egress patterns.
+              </li>
+              <li>
+                <strong>Secrets management</strong> through Secret Manager
+                for credentials and key material.
+              </li>
+              <li>
+                <strong>Observability &amp; audit trails</strong> using Cloud
+                Logging, Cloud Monitoring, and organization-level policy
+                controls.
+              </li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Reliability &amp; operations</h3>
+            <ul class="list">
+              <li>Blue/green and canary rollouts for model versions.</li>
+              <li>Autoscaling for GPU-backed deployments on GKE.</li>
+              <li>SLOs around latency, availability, and throughput.</li>
+              <li>
+                Unified dashboards for data pipeline health and model
+                performance drift.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="getting-started">
+      <div class="kicker">Getting started</div>
+      <h2>Adopting Bioptimus on Google Cloud</h2>
+      <p>
+        Bioptimus works with partners across research, pharma, and healthcare
+        to deploy tailored versions of the Universal Biological Foundation
+        Model on top of their existing or new GCP environments. Engagements
+        typically follow a staged approach that validates value quickly while
+        building a sustainable platform.
+      </p>
+      <div class="section-grid">
+        <div>
+          <div class="card">
+            <h3>Typical engagement phases</h3>
+            <ol class="list">
+              <li>
+                <strong>Discovery &amp; data review</strong> – understand
+                available modalities (slides, omics, EHR), governance
+                requirements, and existing GCP footprint.
+              </li>
+              <li>
+                <strong>Pilot deployment</strong> – provision a dedicated GCP
+                project, ingest a limited dataset, and deploy pre-trained
+                Bioptimus models for a focused use case (e.g., one cancer
+                indication).
+              </li>
+              <li>
+                <strong>Model adaptation</strong> – fine-tune or specialize
+                the foundation model on partner data using Vertex AI
+                pipelines, with evaluation metrics validated by domain
+                experts.
+              </li>
+              <li>
+                <strong>Production rollout</strong> – integrate APIs into
+                downstream research or clinical systems and harden SLOs,
+                security controls, and monitoring.
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <h3>Example GCP project layout</h3>
+            <pre><code>bioptimus-root-org/
+  ├─ proj-bioptimus-shared-tools
+  │    ├─ Shared CI/CD, Artifact Registry, observability
+  ├─ proj-bioptimus-ref-arch
+  │    ├─ Reference pipelines &amp; sample datasets
+  ├─ proj-partner-xyz-sandbox
+  │    ├─ Initial PoC, limited access data
+  └─ proj-partner-xyz-prod
+       ├─ Hardened VPC, private GKE &amp; Vertex endpoints
+       ├─ Cloud Storage buckets for curated datasets
+       └─ BigQuery datasets for analytics &amp; monitoring</code></pre>
+          </div>
+        </div>
+      </div>
+      <p style="margin-top:0.9rem">
+        To explore Bioptimus on Google Cloud or discuss a collaboration,
+        reach out via the contact details on
+        <a href="https://bioptimus.com" target="_blank" rel="noopener noreferrer"
+          >bioptimus.com</a
+        >
+        or integrate this page into your GitHub repository as a public
+        overview of your GCP-powered foundation model.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <span>
+        &copy; <span id="year"></span> Bioptimus. This is an informational
+        page describing how the Bioptimus Universal Biological Foundation
+        Model can be built and operated on Google Cloud Platform.
+      </span>
+      <span>
+        Built for GitHub Pages. Edit this file and commit as
+        <code>index.html</code> or similar in your repository.
+      </span>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
