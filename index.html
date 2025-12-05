@@ -8,406 +8,98 @@
     name="description"
     content="Overview of the Bioptimus Universal Biological Foundation Model and how it is built and deployed on Google Cloud Platform."
   />
-  <style>
-    :root {
-      --bg: #050814;
-      --bg-alt: #0c1020;
-      --accent: #4fd1c5;
-      --accent-soft: rgba(79, 209, 197, 0.16);
-      --text-main: #f7fafc;
-      --text-muted: #a0aec0;
-      --border-subtle: #2d3748;
-      --card-radius: 14px;
-      --max-width: 1120px;
-    }
+ <style>
+  :root {
+    --bg: #f7f9ff;
+    --bg-alt: #ffffff;
+    --accent: #6a5acd;
+    --accent-soft: rgba(106, 90, 205, 0.2);
+    --text-main: #2a2a2a;
+    --text-muted: #6b6b6b;
+    --border-subtle: #e0e0e0;
+    --card-radius: 14px;
+    --max-width: 1120px;
+  }
 
-    * {
-      box-sizing: border-box;
-    }
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: linear-gradient(135deg, #faf7ff 0%, #eef4ff 40%, #e3fdfd 100%);
+    color: var(--text-main);
+    line-height: 1.6;
+  }
 
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
-      background: radial-gradient(circle at top left, #1a365d 0, #050814 50%);
-      color: var(--text-main);
-      line-height: 1.6;
-    }
+  header {
+    background: rgba(255, 255, 255, 0.75);
+    border-bottom: 1px solid #e0e0e0;
+    backdrop-filter: blur(14px);
+  }
 
-    a {
-      color: var(--accent);
-      text-decoration: none;
-    }
+  .logo-mark {
+    background: radial-gradient(circle at 30% 0, #b39ddb 0, #9575cd 40%, #6a5acd 80%);
+    border: 1px solid rgba(106, 90, 205, 0.5);
+    box-shadow: 0 0 12px rgba(106, 90, 205, 0.4);
+  }
 
-    a:hover {
-      text-decoration: underline;
-    }
+  .hero-title span {
+    color: #6a5acd;
+  }
 
-    header {
-      border-bottom: 1px solid rgba(160, 174, 192, 0.15);
-      backdrop-filter: blur(14px);
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      background: linear-gradient(
-        to bottom,
-        rgba(5, 8, 20, 0.96),
-        rgba(5, 8, 20, 0.9),
-        transparent
-      );
-    }
+  .hero-subtitle {
+    color: #6b6b6b;
+  }
 
-    .nav {
-      max-width: var(--max-width);
-      margin: 0 auto;
-      padding: 0.75rem 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1.5rem;
-    }
+  .btn-primary {
+    background: linear-gradient(135deg, #b39ddb, #81d4fa);
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 12px 30px rgba(129, 212, 250, 0.45);
+  }
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      font-size: 0.9rem;
-    }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 34px rgba(129, 212, 250, 0.55);
+  }
 
-    .logo-mark {
-      width: 26px;
-      height: 26px;
-      border-radius: 999px;
-      border: 1px solid rgba(129, 230, 217, 0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.7rem;
-      background: radial-gradient(circle at 30% 0, #81e6d9 0, #234e52 40%, #050814 80%);
-      box-shadow: 0 0 18px rgba(72, 187, 120, 0.7);
-    }
+  .hero-metrics {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(20px);
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 20px 55px rgba(200, 200, 255, 0.4);
+  }
 
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      font-size: 0.9rem;
-    }
+  .metric {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(14px);
+    border: 1px solid #e0e0e0;
+  }
 
-    .nav-links a {
-      color: var(--text-muted);
-      padding: 0.25rem 0.4rem;
-      border-radius: 999px;
-    }
+  .badge {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid #d5d5ff;
+    color: #6a5acd;
+  }
 
-    .nav-links a:hover {
-      background: rgba(113, 128, 150, 0.18);
-      color: var(--text-main);
-      text-decoration: none;
-    }
+  .card {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid #e0e0e0;
+    backdrop-filter: blur(18px);
+    box-shadow: 0 8px 35px rgba(180, 180, 255, 0.35);
+  }
 
-    .pill {
-      border-radius: 999px;
-      border: 1px solid rgba(79, 209, 197, 0.6);
-      padding: 0.25rem 0.75rem;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--accent);
-      background: rgba(15, 118, 110, 0.18);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-    }
+  .use-case {
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px solid #e6e0ff;
+    box-shadow: 0 8px 25px rgba(200, 200, 255, 0.35);
+  }
 
-    .pill-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: #48bb78;
-      box-shadow: 0 0 10px rgba(72, 187, 120, 0.9);
-    }
+  footer {
+    background: rgba(255, 255, 255, 0.5);
+    border-top: 1px solid #e0e0e0;
+  }
+</style>
 
-    main {
-      max-width: var(--max-width);
-      margin: 0 auto;
-      padding: 2.25rem 1.5rem 3.5rem;
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 3fr) minmax(0, 2.4fr);
-      gap: 2rem;
-      align-items: center;
-      margin-top: 1.5rem;
-      margin-bottom: 2.75rem;
-    }
-
-    .hero-title {
-      font-size: clamp(2.2rem, 3.1vw, 2.8rem);
-      line-height: 1.1;
-      margin: 0.75rem 0 0.6rem;
-    }
-
-    .hero-title span {
-      color: var(--accent);
-    }
-
-    .hero-subtitle {
-      color: var(--text-muted);
-      max-width: 36rem;
-      font-size: 0.98rem;
-    }
-
-    .hero-cta {
-      margin-top: 1.2rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      align-items: center;
-    }
-
-    .btn {
-      border-radius: 999px;
-      padding: 0.55rem 1.25rem;
-      font-size: 0.9rem;
-      border: 1px solid transparent;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.45rem;
-      text-decoration: none;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #38b2ac, #63b3ed);
-      color: #0b1120;
-      border-color: rgba(56, 178, 172, 0.9);
-      box-shadow: 0 12px 30px rgba(66, 153, 225, 0.45);
-      font-weight: 600;
-    }
-
-    .btn-primary:hover {
-      box-shadow: 0 14px 32px rgba(66, 153, 225, 0.65);
-      transform: translateY(-1px);
-    }
-
-    .btn-ghost {
-      background: rgba(23, 25, 35, 0.8);
-      border-color: rgba(148, 163, 184, 0.6);
-      color: var(--text-main);
-    }
-
-    .btn-ghost:hover {
-      background: rgba(30, 64, 175, 0.55);
-      text-decoration: none;
-    }
-
-    .hero-metrics {
-      background: radial-gradient(circle at top, rgba(99, 179, 237, 0.16), #050814);
-      border-radius: 18px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      padding: 1.3rem 1.3rem 1.1rem;
-      box-shadow: 0 20px 55px rgba(15, 23, 42, 0.95);
-    }
-
-    .hero-metrics-title {
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.75rem;
-    }
-
-    .chip {
-      border-radius: 999px;
-      border: 1px solid rgba(79, 209, 197, 0.5);
-      padding: 0.25rem 0.7rem;
-      font-size: 0.75rem;
-      color: var(--accent);
-      background: rgba(6, 95, 91, 0.55);
-    }
-
-    .metric-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.9rem;
-      margin-bottom: 0.9rem;
-    }
-
-    .metric {
-      background: rgba(15, 23, 42, 0.85);
-      border-radius: 12px;
-      padding: 0.65rem 0.7rem;
-      border: 1px solid rgba(55, 65, 81, 0.9);
-    }
-
-    .metric-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-muted);
-    }
-
-    .metric-value {
-      font-size: 1.1rem;
-      font-weight: 600;
-    }
-
-    .metric-sub {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    .stack-caption {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      margin-top: 0.35rem;
-    }
-
-    section {
-      margin-bottom: 2.5rem;
-    }
-
-    h2 {
-      font-size: 1.35rem;
-      margin: 0 0 0.6rem;
-    }
-
-    h3 {
-      font-size: 1.05rem;
-      margin: 0 0 0.35rem;
-    }
-
-    p {
-      margin: 0.2rem 0 0.7rem;
-    }
-
-    .kicker {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      color: var(--text-muted);
-      margin-bottom: 0.3rem;
-    }
-
-    .section-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-      gap: 1.7rem;
-      align-items: flex-start;
-    }
-
-    .card {
-      border-radius: var(--card-radius);
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      background: rgba(15, 23, 42, 0.9);
-      padding: 1.1rem 1.2rem;
-      box-shadow: 0 15px 35px rgba(15, 23, 42, 0.85);
-    }
-
-    .card + .card {
-      margin-top: 0.75rem;
-    }
-
-    .list {
-      padding-left: 1.1rem;
-      margin: 0.2rem 0 0.6rem;
-      font-size: 0.92rem;
-      color: var(--text-muted);
-    }
-
-    .list li {
-      margin-bottom: 0.3rem;
-    }
-
-    .badge-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.35rem;
-      margin-top: 0.15rem;
-    }
-
-    .badge {
-      font-size: 0.72rem;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      padding: 0.15rem 0.6rem;
-      color: var(--text-muted);
-      background: rgba(15, 23, 42, 0.7);
-    }
-
-    pre {
-      background: #020617;
-      border-radius: 12px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      padding: 0.9rem 1rem;
-      font-size: 0.78rem;
-      overflow-x: auto;
-      color: #e2e8f0;
-    }
-
-    code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-        "Liberation Mono", "Courier New", monospace;
-    }
-
-    .use-case-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 1rem;
-    }
-
-    .use-case {
-      border-radius: var(--card-radius);
-      border: 1px solid rgba(75, 85, 99, 0.8);
-      padding: 0.85rem 0.9rem;
-      background: rgba(15, 23, 42, 0.95);
-      font-size: 0.9rem;
-    }
-
-    .use-case h3 {
-      margin-bottom: 0.15rem;
-    }
-
-    footer {
-      border-top: 1px solid rgba(148, 163, 184, 0.4);
-      padding: 1.4rem 1.5rem 2rem;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      max-width: var(--max-width);
-      margin: 0 auto;
-    }
-
-    .footer-inner {
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-    }
-
-    @media (max-width: 880px) {
-      .hero {
-        grid-template-columns: minmax(0, 1fr);
-      }
-      .section-grid {
-        grid-template-columns: minmax(0, 1fr);
-      }
-      .use-case-grid {
-        grid-template-columns: minmax(0, 1fr);
-      }
-      .nav-links {
-        display: none;
-      }
-    }
-  </style>
 </head>
 <body>
   <header>
